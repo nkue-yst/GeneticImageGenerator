@@ -9,19 +9,16 @@ file(GLOB SOURCES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 add_executable(GeneticImageGenerator ${SOURCES})
 
 ### Setup SDL2 ###
-option(SDL2_DISABLE_INSTALL ON)
-option(SDL2_DISABLE_UNINSTALL ON)
-option(SDL_TEST OFF)
+set(BUILD_SHARED_LIBS OFF)
 add_subdirectory(SDL)
 set(SDL2_DIR ${CMAKE_BINARY_DIR}/SDL)
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
-target_link_libraries(GeneticImageGenerator ${SDL2_LIBRARIES})
+target_link_libraries(GeneticImageGenerator ${SDL2_STATIC_LIBRARIES})
 
 ### Setup SDL_Image ###
-option(SDL2IMAGE_SAMPLES OFF)
 add_subdirectory(SDL_image)
 set(SDL2_image_DIR ${CMAKE_BINARY_DIR}/SDL_image)
 find_package(SDL2_image REQUIRED)
 include_directories(${CMAKE_SOURCE_DIR}/SDL_image)
-target_link_libraries(GeneticImageGenerator SDL2_image::SDL2_image)
+target_link_libraries(GeneticImageGenerator SDL2_image::SDL2_image-static)
