@@ -8,6 +8,11 @@ project(GeneticImageGenerator CXX)
 file(GLOB SOURCES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 add_executable(GeneticImageGenerator ${SOURCES})
 
+if(WIN32)
+	set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
+	set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT GeneticImageGenerator)
+endif(WIN32)
+
 ### Setup SDL2 ###
 set(BUILD_SHARED_LIBS OFF)
 add_subdirectory(SDL)
