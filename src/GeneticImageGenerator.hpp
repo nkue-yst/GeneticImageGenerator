@@ -32,6 +32,9 @@ public:
     /* ‰Šú‰æ‘œ‚ğw’èŒÂ”ì¬‚·‚é */
     void createFirstGen();
 
+    /* Ÿ‚Ì¢‘ã‚Ì‰æ‘œ‚ğ¶¬‚·‚é */
+    void generateNextGen();
+
     uint32_t w;              // ¶¬‚·‚é‰æ‘œ‚Ì‰¡•
     uint32_t h;              // ¶¬‚·‚é‰æ‘œ‚Ì‚‚³
     uint32_t num_per_gen;    // ¢‘ã‚²‚Æ‚É¶¬‚·‚é‰æ‘œ‚Ì”

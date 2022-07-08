@@ -59,6 +59,22 @@ public:
         return texture;
     }
 
+    /* 2枚の画像間のスコアを計算する */
+    double calcScore(const Image* img)
+    {
+        double score = 0.0;
+
+        for (uint32_t y = 0; y < this->h; y++)
+        {
+            for (uint32_t x = 0; x < this->w; x++)
+            {
+                score += calcEuclid(this->pixels[y * this->w + x], img->pixels[y * img->w + x]);
+            }
+        }
+
+        return score;
+    }
+
     uint32_t w;    // 横幅
     uint32_t h;    // 高さ
 

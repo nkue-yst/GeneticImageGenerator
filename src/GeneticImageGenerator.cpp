@@ -117,7 +117,7 @@ Image* GeneticImageGenerator::createRandomImage()
 
 void GeneticImageGenerator::createFirstGen()
 {
-    std::cout << "--- Generate 1st generation ---" << std::endl;
+    std::cout << "--- Generate generation 1 ---" << std::endl;
     for (uint32_t i = 0; i < this->num_per_gen; i++)
     {
         // 処理が進んでいることを確認するための出力
@@ -128,4 +128,15 @@ void GeneticImageGenerator::createFirstGen()
         this->generated_img_list.push_back(img);
     }
     std::cout << std::endl;
+}
+
+void GeneticImageGenerator::generateNextGen()
+{
+    std::vector<Image*> winners;    // 2つの画像のうちスコアが高い方を入れる配列
+
+    for (uint32_t i = 0; i < this->generated_img_list.size(); i += 2)
+    {
+        // ここで2枚ずつスコアを比較し，勝者を選び，優秀なものを選別する
+
+    }
 }

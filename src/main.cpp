@@ -11,7 +11,7 @@
 
 #define WIDTH  500
 #define HEIGHT 500
-#define NUM_PER_GENERATION 100
+#define NUM_PER_GENERATION 50
 
 int main(int argc, char** argv)
 {
@@ -38,6 +38,7 @@ int main(int argc, char** argv)
     generator->createWindowAndRenderer();               // ウィンドウ・レンダラを作成
     generator->loadOriginalImage(original_img_name);    // 元画像を読み込む
     generator->createFirstGen();                        // 最初の世代の画像を生成する
+    generator->generateNextGen();
 
     SDL_Texture* tex = generator->generated_img_list.at(0)->convertToTexture(generator->renderer);
 
@@ -50,9 +51,6 @@ int main(int argc, char** argv)
         {
             switch (ev.type)
             {
-            case SDL_KEYDOWN:
-                std::cout << "Any key down" << std::endl;
-                break;
             case SDL_QUIT:
                 loop = false;
                 break;
@@ -60,6 +58,8 @@ int main(int argc, char** argv)
                 break;
             }
         }
+
+        //generator->generateNextGen();
 
         SDL_RenderClear(generator->renderer);
         SDL_RenderCopy(generator->renderer, tex, NULL, NULL);
