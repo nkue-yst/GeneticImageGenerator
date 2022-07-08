@@ -11,11 +11,12 @@
 
 #define WIDTH  500
 #define HEIGHT 500
+#define NUM_PER_GENERATION 100
 
 int main(int argc, char** argv)
 {
     // 画像生成クラスの生成
-    std::unique_ptr<GeneticImageGenerator> generator(new GeneticImageGenerator(WIDTH, HEIGHT));
+    std::unique_ptr<GeneticImageGenerator> generator(new GeneticImageGenerator(WIDTH, HEIGHT, NUM_PER_GENERATION));
 
     // コマンドライン引数の数によってファイル名を設定
     std::string original_img_name;
@@ -36,7 +37,7 @@ int main(int argc, char** argv)
 
     generator->createWindowAndRenderer();               // ウィンドウ・レンダラを作成
     generator->loadOriginalImage(original_img_name);    // 元画像を読み込む
-    generator->createFirstGen();
+    generator->createFirstGen();                        // 最初の世代の画像を生成する
 
     SDL_Texture* tex = generator->generated_img_list.at(0)->convertToTexture(generator->renderer);
 

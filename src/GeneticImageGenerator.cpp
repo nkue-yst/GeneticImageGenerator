@@ -1,9 +1,12 @@
 #include "GeneticImageGenerator.hpp"
 #include "Log.hpp"
 
-GeneticImageGenerator::GeneticImageGenerator(uint32_t width, uint32_t height)
+#include <chrono>
+
+GeneticImageGenerator::GeneticImageGenerator(uint32_t width, uint32_t height, uint32_t num_per_generation)
     : w(width)
     , h(height)
+    , num_per_gen(num_per_generation)
 {
     printLog("Create Genetic Image Generator", true);
 
@@ -108,13 +111,21 @@ Image* GeneticImageGenerator::createRandomImage()
             drawPixel(img, x, y, rnd() % 255, rnd() % 255, rnd() % 255);
         }
     }
-    printLog("Create image with random colors", true);
 
     return img;
 }
 
 void GeneticImageGenerator::createFirstGen()
 {
-    Image* img = this->createRandomImage();
-    this->generated_img_list.push_back(img);
+    std::cout << "--- Generate 1st generation ---" << std::endl;
+    for (uint32_t i = 0; i < this->num_per_gen; i++)
+    {
+        // 処理が進んでいることを確認するための出力
+        if (i % 5 == 0)
+            std::cout << ".";
+
+        Image* img = this->createRandomImage();
+        this->generated_img_list.push_back(img);
+    }
+    std::cout << std::endl;
 }
