@@ -1,3 +1,9 @@
+/************************************
+ * GIG (Genetic Image Generator)
+ * Y.Nakaue
+ * 2022/07/07 - ????/??/??
+ ************************************/
+
 #include <iostream>
 #include <random>
 #include <string>
@@ -5,30 +11,46 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
+#define GIG_WIDTH  500    // 使用する画像の横幅
+#define GIG_HEIGHT 500    // 使用する画像の高さ
+
+/* 8ビットx4（RGBA）をUint32型で表現するためのシフトする幅 */
+#define RSHIFT (0)
+#define GSHIFT (8)
+#define BSHIFT (16)
+#define ASHIFT (24)
+
+/* SDL関連の終了処理 */
 void quit()
 {
     IMG_Quit();
     SDL_Quit();
 }
 
+/* Surfaceに対して指定座標を指定色で塗る処理 */
 void drawPixel(SDL_Surface* surface, Sint16 x, Sint16 y, Uint8 r, Uint8 g, Uint8 b)
 {
-    SDL_MapRGB(surface->format + y * surface->pitch + x * surface->format->BytesPerPixel, r, g, b);
+    Uint32* pixels = (Uint32*)surface->pixels;
+
+    Uint32 color = (r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT) | (255 << ASHIFT);
+
+    pixels[y * surface->w + x] = color;
 }
 
+/* 各ピクセルがランダム色で塗られた画像(Surface)を作成する */
 SDL_Surface* createRandomSurface(SDL_Renderer* renderer)
 {
-    SDL_Surface* surface = SDL_CreateRGBSurface(0, 100, 100, 32, 0, 0, 0, 0);
-    std::random_device rnd;
+    SDL_Surface* surface = SDL_CreateRGBSurface(0, GIG_WIDTH, GIG_HEIGHT, 32, 0, 0, 0, 0);    // 真っ黒な画像を作成
+    std::random_device rnd;    // 乱数生成機
 
-    for (int y = 0; y < 100; y++)
+    /* 各ピクセルをランダム色で塗る */
+    for (int y = 0; y < GIG_HEIGHT; y++)
     {
-        for (int x = 0; x < 100; x++)
+        for (int x = 0; x < GIG_WIDTH; x++)
         {
             drawPixel(surface, x, y, rnd() % 255, rnd() % 255, rnd() % 255);
         }
     }
-
     return surface;
 }
 
@@ -53,7 +75,7 @@ int main(int argc, char** argv)
     }
 
     // SDLの初期化
-    SDL_Init(SDL_INIT_EVERYTHING);
+    SDL_Init(SDL_INIT_VIDEO);
     IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
 
     // ウィンドウを作成
@@ -61,8 +83,8 @@ int main(int argc, char** argv)
         "GeneticImageGenerator",
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        100,
-        100,
+        GIG_WIDTH,
+        GIG_HEIGHT,
         SDL_WINDOW_SHOWN
     );
     if (window == NULL)
@@ -71,7 +93,6 @@ int main(int argc, char** argv)
         quit();
         exit(1);
     }
-
     // レンダラの作成
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (renderer == NULL)
@@ -90,10 +111,10 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    // 元画像を100x100にリサイズ
+    // 元画像を使用したいサイズにリサイズ
     SDL_Surface* resized_img = new SDL_Surface();
-    resized_img->w = 100;
-    resized_img->h = 100;
+    resized_img->w = GIG_WIDTH;
+    resized_img->h = GIG_HEIGHT;
     SDL_BlitScaled(original_img, NULL, resized_img, NULL);
 
     // SurfaceからTextureを作成
@@ -104,8 +125,25 @@ int main(int argc, char** argv)
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface_1);
 
     // メインループ
-    while (1)
+    bool loop = true;
+    while (loop)
     {
+        SDL_Event ev;
+        while (SDL_PollEvent(&ev))
+        {
+            switch (ev.type)
+            {
+            case SDL_KEYDOWN:
+                std::cout << "Any key down" << std::endl;
+                break;
+            case SDL_QUIT:
+                loop = false;
+                break;
+            default:
+                break;
+            }
+        }
+
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, texture, NULL, NULL);
         SDL_RenderPresent(renderer);
