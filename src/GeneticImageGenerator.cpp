@@ -1,8 +1,11 @@
 #include "GeneticImageGenerator.hpp"
 #include "Log.hpp"
 
+#include <algorithm>
 #include <chrono>
 #include <utility>
+
+#define ELITE_NUM 4
 
 GeneticImageGenerator::GeneticImageGenerator(uint32_t width, uint32_t height, uint32_t num_per_generation)
     : w(width)
@@ -74,6 +77,10 @@ void GeneticImageGenerator::createWindowAndRenderer()
     {
         printLog("Create renderer", true);
     }
+
+    // 初期描画
+    SDL_RenderClear(this->renderer);
+    SDL_RenderPresent(this->renderer);
 }
 
 void GeneticImageGenerator::loadOriginalImage(std::string name)
@@ -123,7 +130,10 @@ void GeneticImageGenerator::createFirstGen()
     {
         // 処理が進んでいることを確認するための出力
         if (i % 5 == 0)
+        {
             std::cout << ".";
+            std::flush(std::cout);
+        }
 
         Image* img = this->createRandomImage();
         this->generated_img_list.push_back(img);
@@ -133,9 +143,56 @@ void GeneticImageGenerator::createFirstGen()
 
 void GeneticImageGenerator::generateNextGen()
 {
-    std::vector<Image*> winners;    // 2つの画像のうちスコアが高い方を入れる配列
+    static uint32_t current_gen = 2;    // 現在の世代数（2世代目からこの関数を使用するため初期値は2）
+    std::cout << "--- Generate generation " << current_gen << " ---" << std::endl;
 
+    /* 生成した全ての画像のスコアを計算 */
+    std::vector<std::pair<double, Image*>> scored_list;    // 計算したスコアとImageのペアを保持するリスト
     for (Image* img : this->generated_img_list)
     {
+        std::pair<double, Image*> score(img->calcScore(this->original_img), img);
+        scored_list.push_back(score);
     }
+    std::sort(scored_list.begin(), scored_list.end());    // スコアの昇順に並べ替え
+
+    /* スコア上位数個を選抜 */
+    Image* elite[ELITE_NUM];
+    for (int i = 0; i < ELITE_NUM; i++)
+    {
+        elite[i] = scored_list.at(i).second;
+    }
+
+    /* 上位画像のスコアを出力 */
+    for (int i = 0; i < ELITE_NUM; i++)
+    {
+        std::cout << elite[i]->calcScore(this->original_img) << std::endl;
+    }
+
+    /* 上位画像数個からランダムにピクセルデータをコピーし，新たな画像を生成する */
+    std::random_device rnd;         // 乱数生成機
+    std::vector<Image*> new_gen;    // 次の世代の画像リスト
+
+    for (int i = 0; i < this->num_per_gen; i++)
+    {
+        Image* img = new Image(this->w, this->h);
+
+        for (uint32_t y = 0; y < this->h; y++)
+        {
+            for (uint32_t x = 0; x < this->w; x++)
+            {
+                img->pixels[y * img->w + x] = elite[rnd() % ELITE_NUM]->pixels[y * img->w + x];
+            }
+        }
+
+        new_gen.push_back(img);
+    }
+
+    // 最新の世代を更新する
+    std::for_each(this->generated_img_list.begin(), this->generated_img_list.end(), [](Image* img)
+    {
+        delete img;
+    });
+    this->generated_img_list = new_gen;
+
+    std::cout << "--- Complete generating generation " << current_gen++ << " ---" << std::endl;
 }
