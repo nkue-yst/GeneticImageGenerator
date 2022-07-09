@@ -17,7 +17,7 @@ public:
     uint8_t b = 0;
 };
 
-/* 2FŠÔ‚Ìƒ†[ƒNƒŠƒbƒh‹——£‚ğŒvZ‚·‚é */
+/* 2è‰²é–“ã®ãƒ¦ãƒ¼ã‚¯ãƒªãƒƒãƒ‰è·é›¢ã‚’è¨ˆç®—ã™ã‚‹ */
 static double calcEuclid(const Color& c1, const Color& c2)
 {
     double dist = std::sqrt(std::pow(c1.r - c2.r, 2) + pow(c1.g - c2.g, 2) + pow(c1.b - c2.b, 2));

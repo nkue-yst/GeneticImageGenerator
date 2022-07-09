@@ -6,7 +6,7 @@
 
 #include <SDL.h>
 
-/* 8ƒrƒbƒgx4iRGBAj‚ğUint32Œ^‚Å•\Œ»‚·‚é‚½‚ß‚ÌƒVƒtƒg‚·‚é• */
+/* 8ãƒ“ãƒƒãƒˆx4ï¼ˆRGBAï¼‰ã‚’Uint32å‹ã§è¡¨ç¾ã™ã‚‹ãŸã‚ã®ã‚·ãƒ•ãƒˆã™ã‚‹å¹… */
 #define RSHIFT (0)
 #define GSHIFT (8)
 #define BSHIFT (16)
@@ -15,7 +15,7 @@
 class Image
 {
 public:
-    /* ‰Šú‰»‚É‚Í‰¡•E‚‚³‚ğw’è‚µC•‚Å“h‚è‚Â‚Ô‚· */
+    /* åˆæœŸåŒ–æ™‚ã«ã¯æ¨ªå¹…ãƒ»é«˜ã•ã‚’æŒ‡å®šã—ï¼Œé»’ã§å¡—ã‚Šã¤ã¶ã™ */
     Image(uint32_t width, uint32_t height)
         : w(width)
         , h(height)
@@ -29,7 +29,7 @@ public:
         }
     }
 
-    /* SDL_Surface‚É•ÏŠ·‚·‚éˆ— */
+    /* SDL_Surfaceã«å¤‰æ›ã™ã‚‹å‡¦ç† */
     SDL_Surface* convertToSurface()
     {
         SDL_Surface* surface = SDL_CreateRGBSurface(0, this->w, this->h, 32, 0, 0, 0, 0);
@@ -49,7 +49,7 @@ public:
         return surface;
     }
 
-    /* SDL_Texture‚É•ÏŠ·‚·‚éˆ— */
+    /* SDL_Textureã«å¤‰æ›ã™ã‚‹å‡¦ç† */
     SDL_Texture* convertToTexture(SDL_Renderer* renderer)
     {
         SDL_Surface* surface = this->convertToSurface();
@@ -59,7 +59,7 @@ public:
         return texture;
     }
 
-    /* 2–‡‚Ì‰æ‘œŠÔ‚ÌƒXƒRƒA‚ğŒvZ‚·‚é */
+    /* 2æšã®ç”»åƒé–“ã®ã‚¹ã‚³ã‚¢ã‚’è¨ˆç®—ã™ã‚‹ */
     double calcScore(const Image* img)
     {
         double score = 0.0;
@@ -75,8 +75,8 @@ public:
         return score;
     }
 
-    uint32_t w;    // ‰¡•
-    uint32_t h;    // ‚‚³
+    uint32_t w;    // æ¨ªå¹…
+    uint32_t h;    // é«˜ã•
 
-    std::vector<Color> pixels;    // Fî•ñ
+    std::vector<Color> pixels;    // è‰²æƒ…å ±
 };

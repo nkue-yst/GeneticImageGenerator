@@ -14,35 +14,35 @@ public:
     GeneticImageGenerator(uint32_t width, uint32_t height, uint32_t num_per_generation);
     ~GeneticImageGenerator();
 
-    /* ƒEƒBƒ“ƒhƒEEƒŒƒ“ƒ_ƒ‰‚Ìì¬ */
+    /* ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ»ãƒ¬ãƒ³ãƒ€ãƒ©ã®ä½œæˆ */
     void createWindowAndRenderer();
 
-    /* Œ³‰æ‘œ‚ğ“Ç‚İ‚Ş */
+    /* å…ƒç”»åƒã‚’èª­ã¿è¾¼ã‚€ */
     void loadOriginalImage(std::string name);
 
-    /* Image‚É‘Î‚µ‚Äw’èÀ•W‚ğw’èF‚Å“h‚éˆ— */
+    /* Imageã«å¯¾ã—ã¦æŒ‡å®šåº§æ¨™ã‚’æŒ‡å®šè‰²ã§å¡—ã‚‹å‡¦ç† */
     inline void drawPixel(Image* img, Sint16 x, Sint16 y, Uint8 r, Uint8 g, Uint8 b)
     {
         img->pixels.at(y * img->w + x) = Color(r, g, b);
     }
 
-    /* ŠeƒsƒNƒZƒ‹‚ªƒ‰ƒ“ƒ_ƒ€F‚Å“h‚ç‚ê‚½‰æ‘œ(Surface)‚ğì¬‚·‚é */
+    /* å„ãƒ”ã‚¯ã‚»ãƒ«ãŒãƒ©ãƒ³ãƒ€ãƒ è‰²ã§å¡—ã‚‰ã‚ŒãŸç”»åƒ(Surface)ã‚’ä½œæˆã™ã‚‹ */
     Image* createRandomImage();
 
-    /* ‰Šú‰æ‘œ‚ğw’èŒÂ”ì¬‚·‚é */
+    /* åˆæœŸç”»åƒã‚’æŒ‡å®šå€‹æ•°ä½œæˆã™ã‚‹ */
     void createFirstGen();
 
-    /* Ÿ‚Ì¢‘ã‚Ì‰æ‘œ‚ğ¶¬‚·‚é */
+    /* æ¬¡ã®ä¸–ä»£ã®ç”»åƒã‚’ç”Ÿæˆã™ã‚‹ */
     void generateNextGen();
 
-    uint32_t w;              // ¶¬‚·‚é‰æ‘œ‚Ì‰¡•
-    uint32_t h;              // ¶¬‚·‚é‰æ‘œ‚Ì‚‚³
-    uint32_t num_per_gen;    // ¢‘ã‚²‚Æ‚É¶¬‚·‚é‰æ‘œ‚Ì”
+    uint32_t w;              // ç”Ÿæˆã™ã‚‹ç”»åƒã®æ¨ªå¹…
+    uint32_t h;              // ç”Ÿæˆã™ã‚‹ç”»åƒã®é«˜ã•
+    uint32_t num_per_gen;    // ä¸–ä»£ã”ã¨ã«ç”Ÿæˆã™ã‚‹ç”»åƒã®æ•°
 
     std::vector<Image*> generated_img_list;
 
-    SDL_Window* window;        // ƒƒCƒ“ƒEƒBƒ“ƒhƒE
-    SDL_Renderer* renderer;    // ƒƒCƒ“ƒEƒBƒ“ƒhƒE—pƒŒƒ“ƒ_ƒ‰
+    SDL_Window* window;        // ãƒ¡ã‚¤ãƒ³ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
+    SDL_Renderer* renderer;    // ãƒ¡ã‚¤ãƒ³ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ç”¨ãƒ¬ãƒ³ãƒ€ãƒ©
 
-    SDL_Surface* original_img_surface;    // Œ³‰æ‘œƒf[ƒ^
+    SDL_Surface* original_img_surface;    // å…ƒç”»åƒãƒ‡ãƒ¼ã‚¿
 };

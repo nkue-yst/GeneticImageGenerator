@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <string>
+#include <memory>
 
 #define WIDTH  500
 #define HEIGHT 500
@@ -15,10 +16,10 @@
 
 int main(int argc, char** argv)
 {
-    // ‰æ‘œ¶¬ƒNƒ‰ƒX‚Ì¶¬
+    // ç”»åƒç”Ÿæˆã‚¯ãƒ©ã‚¹ã®ç”Ÿæˆ
     std::unique_ptr<GeneticImageGenerator> generator(new GeneticImageGenerator(WIDTH, HEIGHT, NUM_PER_GENERATION));
 
-    // ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“ˆø”‚Ì”‚É‚æ‚Á‚Äƒtƒ@ƒCƒ‹–¼‚ğİ’è
+    // ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³å¼•æ•°ã®æ•°ã«ã‚ˆã£ã¦ãƒ•ã‚¡ã‚¤ãƒ«åã‚’è¨­å®š
     std::string original_img_name;
     if (argc == 2)
     {
@@ -35,14 +36,14 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    generator->createWindowAndRenderer();               // ƒEƒBƒ“ƒhƒEEƒŒƒ“ƒ_ƒ‰‚ğì¬
-    generator->loadOriginalImage(original_img_name);    // Œ³‰æ‘œ‚ğ“Ç‚İ‚Ş
-    generator->createFirstGen();                        // Å‰‚Ì¢‘ã‚Ì‰æ‘œ‚ğ¶¬‚·‚é
+    generator->createWindowAndRenderer();               // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ»ãƒ¬ãƒ³ãƒ€ãƒ©ã‚’ä½œæˆ
+    generator->loadOriginalImage(original_img_name);    // å…ƒç”»åƒã‚’èª­ã¿è¾¼ã‚€
+    generator->createFirstGen();                        // æœ€åˆã®ä¸–ä»£ã®ç”»åƒã‚’ç”Ÿæˆã™ã‚‹
     generator->generateNextGen();
 
     SDL_Texture* tex = generator->generated_img_list.at(0)->convertToTexture(generator->renderer);
 
-    // ƒƒCƒ“ƒ‹[ƒv
+    // ãƒ¡ã‚¤ãƒ³ãƒ«ãƒ¼ãƒ—
     bool loop = true;
     while (loop)
     {

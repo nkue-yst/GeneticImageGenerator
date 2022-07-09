@@ -10,7 +10,7 @@ GeneticImageGenerator::GeneticImageGenerator(uint32_t width, uint32_t height, ui
 {
     printLog("Create Genetic Image Generator", true);
 
-    // SDL‚Ì‰Šú‰»
+    // SDLã®åˆæœŸåŒ–
     SDL_Init(SDL_INIT_VIDEO);
     IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
     printLog("Init SDL2", true);
@@ -20,23 +20,23 @@ GeneticImageGenerator::~GeneticImageGenerator()
 {
     std::cout << std::endl;
 
-    // ¶¬‚µ‚½Image‚Ì”jŠü
+    // ç”Ÿæˆã—ãŸImageã®ç ´æ£„
     for (auto img : this->generated_img_list)
     {
         delete img;
     }
     printLog("Delete generated images", true);
 
-    // Surface‚Ì”jŠü
+    // Surfaceã®ç ´æ£„
     SDL_FreeSurface(this->original_img_surface);
     printLog("Free original image surfaces", true);
 
-    // WindowERenderer‚Ì”jŠü
+    // Windowãƒ»Rendererã®ç ´æ£„
     SDL_DestroyRenderer(this->renderer);
     SDL_DestroyWindow(this->window);
     printLog("Destroy window and renderer", true);
 
-    // SDLŠÖ˜A‚ÌI—¹ˆ—
+    // SDLé–¢é€£ã®çµ‚äº†å‡¦ç†
     IMG_Quit();
     SDL_Quit();
     printLog("Quit SDL2", true);
@@ -46,7 +46,7 @@ GeneticImageGenerator::~GeneticImageGenerator()
 
 void GeneticImageGenerator::createWindowAndRenderer()
 {
-    // ƒEƒBƒ“ƒhƒE‚ğì¬
+    // ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ä½œæˆ
     this->window = SDL_CreateWindow(
         "GeneticImageGenerator",
         SDL_WINDOWPOS_CENTERED,
@@ -65,7 +65,7 @@ void GeneticImageGenerator::createWindowAndRenderer()
         printLog("Create main window", true);
     }
 
-    // ƒŒƒ“ƒ_ƒ‰‚Ìì¬
+    // ãƒ¬ãƒ³ãƒ€ãƒ©ã®ä½œæˆ
     this->renderer = SDL_CreateRenderer(this->window, -1, SDL_RENDERER_ACCELERATED);
     if (this->renderer == NULL)
     {
@@ -100,10 +100,10 @@ void GeneticImageGenerator::loadOriginalImage(std::string name)
 
 Image* GeneticImageGenerator::createRandomImage()
 {
-    Image* img = new Image(this->w, this->h);    // ^‚Á•‚È‰æ‘œ‚ğì¬
-    std::random_device rnd;                      // —”¶¬‹@
+    Image* img = new Image(this->w, this->h);    // çœŸã£é»’ãªç”»åƒã‚’ä½œæˆ
+    std::random_device rnd;                      // ä¹±æ•°ç”Ÿæˆæ©Ÿ
 
-    /* ŠeƒsƒNƒZƒ‹‚ğƒ‰ƒ“ƒ_ƒ€F‚Å“h‚é */
+    /* å„ãƒ”ã‚¯ã‚»ãƒ«ã‚’ãƒ©ãƒ³ãƒ€ãƒ è‰²ã§å¡—ã‚‹ */
     for (int y = 0; y < this->h; y++)
     {
         for (int x = 0; x < this->w; x++)
@@ -120,7 +120,7 @@ void GeneticImageGenerator::createFirstGen()
     std::cout << "--- Generate generation 1 ---" << std::endl;
     for (uint32_t i = 0; i < this->num_per_gen; i++)
     {
-        // ˆ—‚ªi‚ñ‚Å‚¢‚é‚±‚Æ‚ğŠm”F‚·‚é‚½‚ß‚Ìo—Í
+        // å‡¦ç†ãŒé€²ã‚“ã§ã„ã‚‹ã“ã¨ã‚’ç¢ºèªã™ã‚‹ãŸã‚ã®å‡ºåŠ›
         if (i % 5 == 0)
             std::cout << ".";
 
@@ -132,11 +132,11 @@ void GeneticImageGenerator::createFirstGen()
 
 void GeneticImageGenerator::generateNextGen()
 {
-    std::vector<Image*> winners;    // 2‚Â‚Ì‰æ‘œ‚Ì‚¤‚¿ƒXƒRƒA‚ª‚‚¢•û‚ğ“ü‚ê‚é”z—ñ
+    std::vector<Image*> winners;    // 2ã¤ã®ç”»åƒã®ã†ã¡ã‚¹ã‚³ã‚¢ãŒé«˜ã„æ–¹ã‚’å…¥ã‚Œã‚‹é…åˆ—
 
     for (uint32_t i = 0; i < this->generated_img_list.size(); i += 2)
     {
-        // ‚±‚±‚Å2–‡‚¸‚ÂƒXƒRƒA‚ğ”äŠr‚µCŸÒ‚ğ‘I‚ÑC—DG‚È‚à‚Ì‚ğ‘I•Ê‚·‚é
+        // ã“ã“ã§2æšãšã¤ã‚¹ã‚³ã‚¢ã‚’æ¯”è¼ƒã—ï¼Œå‹è€…ã‚’é¸ã³ï¼Œå„ªç§€ãªã‚‚ã®ã‚’é¸åˆ¥ã™ã‚‹
 
     }
 }
