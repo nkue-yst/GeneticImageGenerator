@@ -12,6 +12,12 @@
 #define BSHIFT (16)
 #define ASHIFT (24)
 
+/* 32ビット色情報から各色を取得するためのマスク */
+#define RMASK (0x000000ff)
+#define GMASK (0x0000ff00)
+#define BMASK (0x00ff0000)
+#define AMASK (0xff000000)
+
 class Image
 {
 public:
@@ -57,6 +63,26 @@ public:
 
         SDL_FreeSurface(surface);
         return texture;
+    }
+
+    /* SDL_SurfaceをImageに変換する */
+    static Image* convertoToImage(SDL_Surface* surface)
+    {
+        Image* img = new Image(surface->w, surface->h);
+
+        Uint32* pixels = (Uint32*)surface->pixels;
+        for (uint32_t y = 0; y < surface->h; y++)
+        {
+            for (uint32_t x = 0; x < surface->w; x++)
+            {
+                Uint32 c_value = pixels[y * surface->w + x];
+                img->pixels[y * img->w + x].r = (c_value & RMASK) >> RSHIFT;
+                img->pixels[y * img->w + x].g = (c_value & GMASK) >> GSHIFT;
+                img->pixels[y * img->w + x].b = (c_value & BMASK) >> BSHIFT;
+            }
+        }
+
+        return img;
     }
 
     /* 2枚の画像間のスコアを計算する */

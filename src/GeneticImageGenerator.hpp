@@ -44,5 +44,5 @@ public:
     SDL_Window* window;        // メインウィンドウ
     SDL_Renderer* renderer;    // メインウィンドウ用レンダラ
 
-    SDL_Surface* original_img_surface;    // 元画像データ
+    Image* original_img;    // 元画像データ
 };

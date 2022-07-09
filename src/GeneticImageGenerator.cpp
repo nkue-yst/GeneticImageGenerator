@@ -2,6 +2,7 @@
 #include "Log.hpp"
 
 #include <chrono>
+#include <utility>
 
 GeneticImageGenerator::GeneticImageGenerator(uint32_t width, uint32_t height, uint32_t num_per_generation)
     : w(width)
@@ -21,15 +22,12 @@ GeneticImageGenerator::~GeneticImageGenerator()
     std::cout << std::endl;
 
     // 生成したImageの破棄
+    delete this->original_img;
     for (auto img : this->generated_img_list)
     {
         delete img;
     }
     printLog("Delete generated images", true);
-
-    // Surfaceの破棄
-    SDL_FreeSurface(this->original_img_surface);
-    printLog("Free original image surfaces", true);
 
     // Window・Rendererの破棄
     SDL_DestroyRenderer(this->renderer);
@@ -81,7 +79,7 @@ void GeneticImageGenerator::createWindowAndRenderer()
 void GeneticImageGenerator::loadOriginalImage(std::string name)
 {
     SDL_Surface* surface = IMG_Load(name.c_str());
-    if (!this->original_img_surface)
+    if (!surface)
     {
         printLog("Load original image", false);
         exit(1);
@@ -91,10 +89,13 @@ void GeneticImageGenerator::loadOriginalImage(std::string name)
         printLog("Load original image", true);
     }
 
-    this->original_img_surface = SDL_CreateRGBSurface(0, this->w, this->h, 32, 0, 0, 0, 0);
-    SDL_BlitScaled(surface, NULL, this->original_img_surface, NULL);
+    SDL_Surface* original_img_surface = SDL_CreateRGBSurface(0, this->w, this->h, 32, 0, 0, 0, 0);
+    SDL_BlitScaled(surface, NULL, original_img_surface, NULL);
     printLog("Scale original image", true);
 
+    this->original_img = Image::convertoToImage(original_img_surface);
+
+    SDL_FreeSurface(original_img_surface);
     SDL_FreeSurface(surface);
 }
 
@@ -127,16 +128,14 @@ void GeneticImageGenerator::createFirstGen()
         Image* img = this->createRandomImage();
         this->generated_img_list.push_back(img);
     }
-    std::cout << std::endl;
+    std::cout << std::endl << "--- Complete generating generation 1 ---" << std::endl;
 }
 
 void GeneticImageGenerator::generateNextGen()
 {
     std::vector<Image*> winners;    // 2つの画像のうちスコアが高い方を入れる配列
 
-    for (uint32_t i = 0; i < this->generated_img_list.size(); i += 2)
+    for (Image* img : this->generated_img_list)
     {
-        // ここで2枚ずつスコアを比較し，勝者を選び，優秀なものを選別する
-
     }
 }

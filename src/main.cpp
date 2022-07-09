@@ -12,7 +12,7 @@
 
 #define WIDTH  500
 #define HEIGHT 500
-#define NUM_PER_GENERATION 50
+#define NUM_PER_GENERATION 10
 
 int main(int argc, char** argv)
 {
