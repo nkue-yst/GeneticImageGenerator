@@ -71,9 +71,9 @@ public:
         Image* img = new Image(surface->w, surface->h);
 
         Uint32* pixels = (Uint32*)surface->pixels;
-        for (uint32_t y = 0; y < surface->h; y++)
+        for (int32_t y = 0; y < surface->h; y++)
         {
-            for (uint32_t x = 0; x < surface->w; x++)
+            for (int32_t x = 0; x < surface->w; x++)
             {
                 Uint32 c_value = pixels[y * surface->w + x];
                 img->pixels[y * img->w + x].r = (c_value & RMASK) >> RSHIFT;

@@ -11,7 +11,7 @@
 class GeneticImageGenerator
 {
 public:
-    GeneticImageGenerator(uint32_t width, uint32_t height, uint32_t num_per_generation);
+    GeneticImageGenerator(uint32_t width, uint32_t height, uint32_t num_per_generation, float mutation_rate);
     ~GeneticImageGenerator();
 
     /* ウィンドウ・レンダラの作成 */
@@ -38,8 +38,9 @@ public:
     uint32_t w;              // 生成する画像の横幅
     uint32_t h;              // 生成する画像の高さ
     uint32_t num_per_gen;    // 世代ごとに生成する画像の数
+    float mutation_rate;     // 突然変異の確率
 
-    std::vector<Image*> generated_img_list;
+    std::vector<Image*> generated_img_list;    // 生成した画像リスト
 
     SDL_Window* window;        // メインウィンドウ
     SDL_Renderer* renderer;    // メインウィンドウ用レンダラ

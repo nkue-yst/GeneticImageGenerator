@@ -12,14 +12,14 @@
 
 #define WIDTH  100
 #define HEIGHT 100
-#define NUM_PER_GENERATION 50
+#define NUM_PER_GENERATION 100
+#define MUTATION_RATE 0.5f
 
 int main(int argc, char** argv)
 {
     // 画像生成クラスの生成
-    std::unique_ptr<GeneticImageGenerator> generator(new GeneticImageGenerator(WIDTH, HEIGHT, NUM_PER_GENERATION));
+    std::unique_ptr<GeneticImageGenerator> generator(new GeneticImageGenerator(WIDTH, HEIGHT, NUM_PER_GENERATION, MUTATION_RATE));
 
-    // コマンドライン引数の数によってファイル名を設定
     std::string original_img_name;
     if (argc == 2)
     {
@@ -40,9 +40,8 @@ int main(int argc, char** argv)
     generator->loadOriginalImage(original_img_name);    // 元画像を読み込む
     generator->createFirstGen();                        // 最初の世代の画像を生成する
 
-    SDL_Texture* tex = generator->generated_img_list.at(0)->convertToTexture(generator->renderer);
+    SDL_Texture* tex = NULL;
 
-    // メインループ
     bool loop = true;
     while (loop)
     {
@@ -59,13 +58,14 @@ int main(int argc, char** argv)
             }
         }
 
-        generator->generateNextGen();
+        SDL_DestroyTexture(tex);
+        tex = generator->generated_img_list.at(0)->convertToTexture(generator->renderer);
 
         SDL_RenderClear(generator->renderer);
         SDL_RenderCopy(generator->renderer, tex, NULL, NULL);
         SDL_RenderPresent(generator->renderer);
 
-        SDL_Delay(1000);
+        generator->generateNextGen();    // 次の世代を生成する
     }
 
     SDL_DestroyTexture(tex);
