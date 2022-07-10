@@ -167,10 +167,6 @@ void GeneticImageGenerator::generateNextGen()
         new_gen.push_back(elite_img);
     }
 
-    /* 上位画像のスコアを出力 */
-    for (int i = 0; i < ELITE_NUM; i++)
-        std::cout << elite[i]->calcScore(this->original_img) << std::endl;
-
     /* 上位画像数個からランダムにピクセルデータをコピーし，新たな画像を生成する */
     std::random_device rnd;    // 乱数生成機
 
@@ -196,12 +192,16 @@ void GeneticImageGenerator::generateNextGen()
         new_gen.push_back(img);
     }
 
-    // 最新の世代を更新する
-    std::for_each(this->generated_img_list.begin(), this->generated_img_list.end(), [](Image* img)
-    {
-        delete img;
-    });
-    this->generated_img_list = new_gen;
+    /* 上位画像のスコアを出力 */
+    for (int i = 0; i < ELITE_NUM; i++)
+        std::cout << "Score[" << i + 1 << "]: " << elite[i]->calcScore(this->original_img) << std::endl;
 
     std::cout << "--- Complete generating generation " << current_gen++ << " ---" << std::endl;
+
+    // 最新の世代を更新する
+    std::for_each(this->generated_img_list.begin(), this->generated_img_list.end(), [](Image* img)
+        {
+            delete img;
+        });
+    this->generated_img_list = new_gen;
 }

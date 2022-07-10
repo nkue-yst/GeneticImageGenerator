@@ -12,8 +12,8 @@
 
 #define WIDTH  100
 #define HEIGHT 100
-#define NUM_PER_GENERATION 500    // 世代ごとの生成する画像数
-#define MUTATION_RATE 0.1f        // 突然変異の確率（1%）
+#define NUM_PER_GENERATION 300    // 世代ごとの生成する画像数
+#define MUTATION_RATE 0.01f        // 突然変異の確率（1%）
 
 int main(int argc, char** argv)
 {
