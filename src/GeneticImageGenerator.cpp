@@ -29,10 +29,10 @@ GeneticImageGenerator::~GeneticImageGenerator()
     // 最後に生成した世代の画像を保存
     std::string file_name = "gen";
     file_name += std::to_string(this->current_gen);
-    file_name += ".bmp";
+    file_name += ".png";
 
     SDL_Surface* surface = this->generated_img_list.front()->convertToSurface();
-    SDL_SaveBMP(surface, file_name.c_str());
+    IMG_SavePNG(surface, file_name.c_str());
     SDL_FreeSurface(surface);
 
     // 生成したImageの破棄
@@ -109,7 +109,7 @@ void GeneticImageGenerator::loadOriginalImage(std::string name)
 
     SDL_Surface* original_img_surface = SDL_CreateRGBSurface(0, this->w, this->h, 32, 0, 0, 0, 0);
     SDL_BlitScaled(surface, NULL, original_img_surface, NULL);
-    SDL_SaveBMP(original_img_surface, "original.bmp");
+    IMG_SavePNG(original_img_surface, "original.png");
     printLog("Scale original image", true);
 
     this->original_img = Image::convertoToImage(original_img_surface);
@@ -153,7 +153,7 @@ void GeneticImageGenerator::createFirstGen()
 
     /* 第0世代を保存する */
     SDL_Surface* surface = this->generated_img_list.front()->convertToSurface();
-    SDL_SaveBMP(surface, "gen0.bmp");
+    IMG_SavePNG(surface, "gen0.png");
     SDL_FreeSurface(surface);
 
     std::cout << std::endl << "--- Complete generating generation 1 ---" << std::endl;
@@ -211,6 +211,18 @@ void GeneticImageGenerator::generateNextGen()
     /* 上位画像のスコアを出力 */
     for (int i = 0; i < ELITE_NUM; i++)
         std::cout << "Score[" << i + 1 << "]: " << elite[i]->calcScore(this->original_img) << std::endl;
+
+    // 100世代ごとに画像を保存
+    if (this->current_gen % 100 == 0)
+    {
+        std::string file_name = "gen";
+        file_name += std::to_string(this->current_gen);
+        file_name += ".png";
+
+        SDL_Surface* surface = this->generated_img_list.front()->convertToSurface();
+        IMG_SavePNG(surface, file_name.c_str());
+        SDL_FreeSurface(surface);
+    }
 
     std::cout << "--- Complete generating generation " << this->current_gen++ << " ---" << std::endl;
 
