@@ -40,6 +40,7 @@ public:
     uint32_t num_per_gen;    // 世代ごとに生成する画像の数
     float mutation_rate;     // 突然変異の確率
 
+    uint32_t current_gen = 2;                  // 現在の世代数
     std::vector<Image*> generated_img_list;    // 生成した画像リスト
 
     SDL_Window* window;        // メインウィンドウ

@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <string>
 #include <utility>
 
 #define ELITE_NUM 4
@@ -24,6 +25,15 @@ GeneticImageGenerator::GeneticImageGenerator(uint32_t width, uint32_t height, ui
 GeneticImageGenerator::~GeneticImageGenerator()
 {
     std::cout << std::endl;
+
+    // 最後に生成した世代の画像を保存
+    std::string file_name = "gen";
+    file_name += std::to_string(this->current_gen);
+    file_name += ".bmp";
+
+    SDL_Surface* surface = this->generated_img_list.front()->convertToSurface();
+    SDL_SaveBMP(surface, file_name.c_str());
+    SDL_FreeSurface(surface);
 
     // 生成したImageの破棄
     delete this->original_img;
@@ -99,6 +109,7 @@ void GeneticImageGenerator::loadOriginalImage(std::string name)
 
     SDL_Surface* original_img_surface = SDL_CreateRGBSurface(0, this->w, this->h, 32, 0, 0, 0, 0);
     SDL_BlitScaled(surface, NULL, original_img_surface, NULL);
+    SDL_SaveBMP(original_img_surface, "original.bmp");
     printLog("Scale original image", true);
 
     this->original_img = Image::convertoToImage(original_img_surface);
@@ -139,12 +150,17 @@ void GeneticImageGenerator::createFirstGen()
         Image* img = this->createRandomImage();
         this->generated_img_list.push_back(img);
     }
+
+    /* 第0世代を保存する */
+    SDL_Surface* surface = this->generated_img_list.front()->convertToSurface();
+    SDL_SaveBMP(surface, "gen0.bmp");
+    SDL_FreeSurface(surface);
+
     std::cout << std::endl << "--- Complete generating generation 1 ---" << std::endl;
 }
 
 void GeneticImageGenerator::generateNextGen()
 {
-    static uint32_t current_gen = 2;    // 現在の世代数（2世代目からこの関数を使用するため初期値は2）
     std::cout << "--- Generate generation " << current_gen << " ---" << std::endl;
 
     /* 生成した全ての画像のスコアを計算 */
@@ -196,7 +212,7 @@ void GeneticImageGenerator::generateNextGen()
     for (int i = 0; i < ELITE_NUM; i++)
         std::cout << "Score[" << i + 1 << "]: " << elite[i]->calcScore(this->original_img) << std::endl;
 
-    std::cout << "--- Complete generating generation " << current_gen++ << " ---" << std::endl;
+    std::cout << "--- Complete generating generation " << this->current_gen++ << " ---" << std::endl;
 
     // 最新の世代を更新する
     std::for_each(this->generated_img_list.begin(), this->generated_img_list.end(), [](Image* img)
