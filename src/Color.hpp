@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <cmath>
+#include <random>
 
 class Color
 {
@@ -22,4 +23,10 @@ static double calcEuclid(const Color& c1, const Color& c2)
 {
     double dist = std::sqrt(std::pow(c1.r - c2.r, 2) + pow(c1.g - c2.g, 2) + pow(c1.b - c2.b, 2));
     return dist;
+}
+
+static Color randomColor()
+{
+    std::random_device rnd;
+    return Color(rnd() % 255, rnd() % 255, rnd() % 255);
 }

@@ -182,7 +182,14 @@ void GeneticImageGenerator::generateNextGen()
         {
             for (uint32_t x = 0; x < this->w; x++)
             {
-                img->pixels[y * img->w + x] = elite[rnd() % ELITE_NUM]->pixels[y * img->w + x];
+                if ((double)rnd() / std::random_device::max() < this->mutation_rate)    // 突然変異
+                {
+                    img->pixels[y * img->w + x] = randomColor();
+                }
+                else
+                {
+                    img->pixels[y * img->w + x] = elite[rnd() % ELITE_NUM]->pixels[y * img->w + x];
+                }
             }
         }
 
