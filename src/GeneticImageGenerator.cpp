@@ -163,6 +163,9 @@ void GeneticImageGenerator::generateNextGen()
 {
     std::cout << "--- Generate generation " << current_gen << " ---" << std::endl;
 
+    std::chrono::system_clock::time_point start_tp;    // 処理時間計測用タイムポイント
+    start_tp = std::chrono::system_clock::now();
+
     /* 生成した全ての画像のスコアを計算 */
     std::vector<std::pair<double, Image*>> scored_list;    // 計算したスコアとImageのペアを保持するリスト
     for (Image* img : this->generated_img_list)
@@ -208,6 +211,8 @@ void GeneticImageGenerator::generateNextGen()
         new_gen.push_back(img);
     }
 
+    double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start_tp).count();
+
     /* 上位画像のスコアを出力 */
     for (int i = 0; i < ELITE_NUM; i++)
         std::cout << "Score[" << i + 1 << "]: " << elite[i]->calcScore(this->original_img) << std::endl;
@@ -224,7 +229,7 @@ void GeneticImageGenerator::generateNextGen()
         SDL_FreeSurface(surface);
     }
 
-    std::cout << "--- Complete generating generation " << this->current_gen++ << " ---" << std::endl;
+    std::cout << "--- Complete generating generation " << this->current_gen++ << " (" << elapsed << "ms) ---" << std::endl;
 
     // 最新の世代を更新する
     std::for_each(this->generated_img_list.begin(), this->generated_img_list.end(), [](Image* img)
