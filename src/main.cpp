@@ -53,6 +53,14 @@ int main(int argc, char** argv)
             case SDL_QUIT:
                 loop = false;
                 break;
+            
+            case SDL_WINDOWEVENT:
+                if (ev.window.event == SDL_WINDOWEVENT_CLOSE)
+                {
+                    loop = false;
+                    break;
+                }
+
             default:
                 break;
             }

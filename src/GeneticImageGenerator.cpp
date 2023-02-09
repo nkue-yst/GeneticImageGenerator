@@ -213,7 +213,7 @@ void GeneticImageGenerator::generateNextGen()
         std::cout << "Score[" << i + 1 << "]: " << elite[i]->calcScore(this->original_img) << std::endl;
 
     // 100世代ごとに画像を保存
-    if (this->current_gen % 100 == 0)
+    if (this->current_gen % 10 == 0)
     {
         std::string file_name = "gen";
         file_name += std::to_string(this->current_gen);
