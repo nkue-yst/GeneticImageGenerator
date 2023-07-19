@@ -3,8 +3,11 @@
 
 #include <algorithm>
 #include <chrono>
+#include <filesystem>
 #include <string>
 #include <utility>
+
+#include "pbar.hpp"
 
 #define ELITE_NUM 4
 
@@ -20,6 +23,9 @@ GeneticImageGenerator::GeneticImageGenerator(uint32_t width, uint32_t height, ui
     SDL_Init(SDL_INIT_VIDEO);
     IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
     printLog("Init SDL2", true);
+
+    // 生成画像の保存先ディレクトリを作成
+    std::filesystem::create_directory("generated_image");
 }
 
 GeneticImageGenerator::~GeneticImageGenerator()
@@ -27,7 +33,7 @@ GeneticImageGenerator::~GeneticImageGenerator()
     std::cout << std::endl;
 
     // 最後に生成した世代の画像を保存
-    std::string file_name = "gen";
+    std::string file_name = "./generated_image/gen";
     file_name += std::to_string(this->current_gen);
     file_name += ".png";
 
@@ -109,7 +115,7 @@ void GeneticImageGenerator::loadOriginalImage(std::string name)
 
     SDL_Surface* original_img_surface = SDL_CreateRGBSurface(0, this->w, this->h, 32, 0, 0, 0, 0);
     SDL_BlitScaled(surface, NULL, original_img_surface, NULL);
-    IMG_SavePNG(original_img_surface, "original.png");
+    IMG_SavePNG(original_img_surface, "./generated_image/original.png");
     printLog("Scale original image", true);
 
     this->original_img = Image::convertoToImage(original_img_surface);
@@ -123,10 +129,10 @@ Image* GeneticImageGenerator::createRandomImage()
     Image* img = new Image(this->w, this->h);    // 真っ黒な画像を作成
     std::random_device rnd;                      // 乱数生成機
 
-    /* 各ピクセルをランダム色で塗る */
-    for (int y = 0; y < this->h; y++)
+    // 各ピクセルをランダム色で塗る
+    for (int y = 0; y < this->h; ++y)
     {
-        for (int x = 0; x < this->w; x++)
+        for (int x = 0; x < this->w; ++x)
         {
             drawPixel(img, x, y, rnd() % 255, rnd() % 255, rnd() % 255);
         }
@@ -137,31 +143,32 @@ Image* GeneticImageGenerator::createRandomImage()
 
 void GeneticImageGenerator::createFirstGen()
 {
-    std::cout << "--- Generate generation 1 ---" << std::endl;
-    for (uint32_t i = 0; i < this->num_per_gen; i++)
-    {
-        // 処理が進んでいることを確認するための出力
-        if (i % 5 == 0)
-        {
-            std::cout << ".";
-            std::flush(std::cout);
-        }
+    //////////////////////
+    ///// プログレスバーの設定 /////
+    //////////////////////
+    pbar::pbar bar(this->num_per_gen, "Generate");
+    bar.enable_recalc_console_width(1);
 
+    std::cout << std::endl << "--- Generate generation 1 ---" << std::endl;
+    bar.init();
+
+    for (uint32_t i = 0; i < this->num_per_gen; ++i)
+    {
         Image* img = this->createRandomImage();
         this->generated_img_list.push_back(img);
+
+        bar.tick();
     }
 
     /* 第0世代を保存する */
     SDL_Surface* surface = this->generated_img_list.front()->convertToSurface();
-    IMG_SavePNG(surface, "gen0.png");
+    IMG_SavePNG(surface, "./generated_image/gen1.png");
     SDL_FreeSurface(surface);
-
-    std::cout << std::endl << "--- Complete generating generation 1 ---" << std::endl;
 }
 
 void GeneticImageGenerator::generateNextGen()
 {
-    std::cout << "--- Generate generation " << current_gen << " ---" << std::endl;
+    std::cout << std::endl << "--- Generate generation " << ++current_gen << " ---" << std::endl;
 
     std::chrono::system_clock::time_point start_tp;    // 処理時間計測用タイムポイント
     start_tp = std::chrono::system_clock::now();
@@ -189,6 +196,13 @@ void GeneticImageGenerator::generateNextGen()
     /* 上位画像数個からランダムにピクセルデータをコピーし，新たな画像を生成する */
     std::random_device rnd;    // 乱数生成機
 
+    //////////////////////
+    ///// プログレスバーの設定 /////
+    //////////////////////
+    pbar::pbar bar(this->num_per_gen - ELITE_NUM, "Generate");
+    bar.enable_recalc_console_width(1);
+    bar.init();    
+
     for (int i = 0; i < this->num_per_gen - ELITE_NUM; i++)
     {
         Image* img = new Image(this->w, this->h);
@@ -209,6 +223,8 @@ void GeneticImageGenerator::generateNextGen()
         }
 
         new_gen.push_back(img);
+
+        bar.tick();
     }
 
     double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start_tp).count();
@@ -217,10 +233,10 @@ void GeneticImageGenerator::generateNextGen()
     for (int i = 0; i < ELITE_NUM; i++)
         std::cout << "Score[" << i + 1 << "]: " << elite[i]->calcScore(this->original_img) << std::endl;
 
-    // 100世代ごとに画像を保存
+    // 10世代ごとに画像を保存
     if (this->current_gen % 10 == 0)
     {
-        std::string file_name = "gen";
+        std::string file_name = "./generated_image/gen";
         file_name += std::to_string(this->current_gen);
         file_name += ".png";
 
@@ -228,8 +244,6 @@ void GeneticImageGenerator::generateNextGen()
         IMG_SavePNG(surface, file_name.c_str());
         SDL_FreeSurface(surface);
     }
-
-    std::cout << "--- Complete generating generation " << this->current_gen++ << " (" << elapsed << "ms) ---" << std::endl;
 
     // 最新の世代を更新する
     std::for_each(this->generated_img_list.begin(), this->generated_img_list.end(), [](Image* img)

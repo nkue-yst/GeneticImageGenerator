@@ -27,3 +27,6 @@ set(SDL2_image_DIR ${CMAKE_BINARY_DIR}/SDL_image)
 find_package(SDL2_image REQUIRED)
 include_directories(${CMAKE_SOURCE_DIR}/SDL_image)
 target_link_libraries(GeneticImageGenerator SDL2_image::SDL2_image-static)
+
+### Setup pbar ###
+include_directories(${CMAKE_SOURCE_DIR}/pbar)
