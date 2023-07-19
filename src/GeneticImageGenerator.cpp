@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <filesystem>
-#include <string>
 #include <utility>
 
 #include "pbar.hpp"
@@ -18,6 +17,8 @@ GeneticImageGenerator::GeneticImageGenerator(uint32_t width, uint32_t height, ui
 {
     printLog("Create Genetic Image Generator", true);
 
+    this->generated_img_list.reserve(num_per_generation);
+
     ///////////////////////
     ///// SDLの初期化 /////
     ///////////////////////
@@ -27,6 +28,9 @@ GeneticImageGenerator::GeneticImageGenerator(uint32_t width, uint32_t height, ui
 
     // 生成画像の保存先ディレクトリを作成
     std::filesystem::create_directory("generated_image");
+
+    // 最高スコアの記録用csvファイルを作成
+    this->ofs_record_file = std::ofstream("score.csv");
 }
 
 GeneticImageGenerator::~GeneticImageGenerator()
@@ -40,7 +44,7 @@ GeneticImageGenerator::~GeneticImageGenerator()
     file_name += std::to_string(this->current_gen);
     file_name += ".png";
 
-    SDL_Surface* surface = this->generated_img_list.front()->convertToSurface();
+    SDL_Surface* surface = this->scored_list.front().second->convertToSurface();
     IMG_SavePNG(surface, file_name.c_str());
     SDL_FreeSurface(surface);
 
@@ -154,16 +158,16 @@ Image* GeneticImageGenerator::createRandomImage()
 
 void GeneticImageGenerator::createFirstGen()
 {
+    std::cout << std::endl << "--- Generate generation 1 ---" << std::endl;
+
     ////////////////////////////////
     ///// プログレスバーの設定 /////
     ////////////////////////////////
-    pbar::pbar bar(this->num_per_gen, "Generate");
+    pbar::pbar bar(ELITE_NUM, "Generate ");
     bar.enable_recalc_console_width(1);
-
-    std::cout << std::endl << "--- Generate generation 1 ---" << std::endl;
     bar.init();
 
-    for (uint32_t i = 0; i < this->num_per_gen; ++i)
+    for (int i = 0; i < ELITE_NUM; ++i)
     {
         Image* img = this->createRandomImage();
         this->generated_img_list.push_back(img);
@@ -171,10 +175,38 @@ void GeneticImageGenerator::createFirstGen()
         bar.tick();
     }
 
+    ////////////////////////////////////////////
+    ///// 生成した全ての画像のスコアを計算 /////
+    ////////////////////////////////////////////
+    // プログレスバーの設定
+    pbar::pbar bar_calc(this->generated_img_list.size(), "Calculate");
+    bar_calc.enable_recalc_console_width(1);
+    bar_calc.init();
+
+    for (Image* img : this->generated_img_list)
+    {
+        std::pair<double, Image*> score(img->calcScore(this->original_img), img);
+        this->scored_list.push_back(score);
+
+        bar_calc.tick();
+    }
+    std::sort(this->scored_list.begin(), this->scored_list.end());    // スコアの昇順に並べ替え
+
+    //////////////////////////////////
+    ///// 上位画像のスコアを出力 /////
+    //////////////////////////////////
+    for (int i = 0; i < ELITE_NUM; i++)
+        std::cout << "Score[" << i + 1 << "]: " << this->scored_list.at(i).first << std::endl;
+
+    ////////////////////////////
+    ///// 最高スコアを記録 /////
+    ////////////////////////////
+    this->ofs_record_file << "第1世代" << ',' << this->scored_list.front().first << std::endl;
+
     /////////////////////////////
     ///// 第1世代を保存する /////
     /////////////////////////////
-    SDL_Surface* surface = this->generated_img_list.front()->convertToSurface();
+    SDL_Surface* surface = this->scored_list.front().second->convertToSurface();
     IMG_SavePNG(surface, "./generated_image/gen1.png");
     SDL_FreeSurface(surface);
 }
@@ -183,26 +215,15 @@ void GeneticImageGenerator::generateNextGen()
 {
     std::cout << std::endl << "--- Generate generation " << ++current_gen << " ---" << std::endl;
 
-    ////////////////////////////////////////////
-    ///// 生成した全ての画像のスコアを計算 /////
-    ////////////////////////////////////////////
-    std::vector<std::pair<double, Image*>> scored_list;    // 計算したスコアとImageのペアを保持するリスト
-    for (Image* img : this->generated_img_list)
-    {
-        std::pair<double, Image*> score(img->calcScore(this->original_img), img);
-        scored_list.push_back(score);
-    }
-    std::sort(scored_list.begin(), scored_list.end());    // スコアの昇順に並べ替え
+    std::vector<Image*> new_gen;    // 次の世代の画像リスト
 
     ////////////////////////////////
     ///// スコア上位数個を選抜 /////
     ////////////////////////////////
-    std::vector<Image*> new_gen;    // 次の世代の画像リスト
-
     Image* elite[ELITE_NUM];
-    for (int i = 0; i < ELITE_NUM; i++)
+    for (int i = 0; i < ELITE_NUM; ++i)
     {
-        elite[i] = scored_list.at(i).second;
+        elite[i] = this->scored_list.at(i).second;
         Image* elite_img = new Image(*elite[i]);
         new_gen.push_back(elite_img);
     }
@@ -215,9 +236,9 @@ void GeneticImageGenerator::generateNextGen()
     ////////////////////////////////
     ///// プログレスバーの設定 /////
     ////////////////////////////////
-    pbar::pbar bar(this->num_per_gen - ELITE_NUM, "Generate");
+    pbar::pbar bar(this->num_per_gen - ELITE_NUM, "Generate ");
     bar.enable_recalc_console_width(1);
-    bar.init();    
+    bar.init();
 
     for (int i = 0; i < this->num_per_gen - ELITE_NUM; i++)
     {
@@ -243,11 +264,42 @@ void GeneticImageGenerator::generateNextGen()
         bar.tick();    // プログレスバーの更新
     }
 
+    ////////////////////////////////////////////
+    ///// 生成した全ての画像のスコアを計算 /////
+    ////////////////////////////////////////////
+    // プログレスバーの設定
+    pbar::pbar bar_calc(new_gen.size(), "Calculate");
+    bar_calc.enable_recalc_console_width(1);
+
+    this->scored_list.clear();
+    for (Image* img : new_gen)
+    {
+        std::pair<double, Image*> score(img->calcScore(this->original_img), img);
+        this->scored_list.push_back(score);
+
+        bar_calc.tick();
+    }
+    std::sort(this->scored_list.begin(), this->scored_list.end());    // スコアの昇順に並べ替え
+
+    ////////////////////////////////
+    ///// 最新の世代を更新する /////
+    ////////////////////////////////
+    std::for_each(this->generated_img_list.begin(), this->generated_img_list.end(), [](Image* img)
+        {
+            delete img;
+        });
+    this->generated_img_list = new_gen;
+
     //////////////////////////////////
     ///// 上位画像のスコアを出力 /////
     //////////////////////////////////
     for (int i = 0; i < ELITE_NUM; i++)
-        std::cout << "Score[" << i + 1 << "]: " << elite[i]->calcScore(this->original_img) << std::endl;
+        std::cout << "Score[" << i + 1 << "]: " << this->scored_list.at(i).first << std::endl;
+
+    ////////////////////////////
+    ///// 最高スコアを記録 /////
+    ////////////////////////////
+    this->ofs_record_file << "第" << this->current_gen << "世代" << ',' << this->scored_list.front().first << std::endl;
 
     //////////////////////////////////
     ///// 10世代ごとに画像を保存 /////
@@ -258,17 +310,8 @@ void GeneticImageGenerator::generateNextGen()
         file_name += std::to_string(this->current_gen);
         file_name += ".png";
 
-        SDL_Surface* surface = this->generated_img_list.front()->convertToSurface();
+        SDL_Surface* surface = this->scored_list.front().second->convertToSurface();
         IMG_SavePNG(surface, file_name.c_str());
         SDL_FreeSurface(surface);
     }
-
-    ////////////////////////////////
-    ///// 最新の世代を更新する /////
-    ////////////////////////////////
-    std::for_each(this->generated_img_list.begin(), this->generated_img_list.end(), [](Image* img)
-        {
-            delete img;
-        });
-    this->generated_img_list = new_gen;
 }

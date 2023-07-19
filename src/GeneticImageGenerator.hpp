@@ -5,6 +5,9 @@
 #include <string>
 #include <vector>
 
+#include <fstream>
+#include <sstream>
+
 #include <SDL.h>
 #include <SDL_image.h>
 
@@ -43,8 +46,12 @@ public:
     uint32_t current_gen = 1;                  // 現在の世代数
     std::vector<Image*> generated_img_list;    // 生成した画像リスト
 
+    std::vector<std::pair<double, Image*>> scored_list;    // 計算したスコアとImageのペアを保持するリスト（ソート済み）
+
     SDL_Window* window;        // メインウィンドウ
     SDL_Renderer* renderer;    // メインウィンドウ用レンダラ
 
     Image* original_img;    // 元画像データ
+
+    std::ofstream ofs_record_file;    // 最高スコア記録用ファイル
 };

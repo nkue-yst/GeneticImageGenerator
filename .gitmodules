@@ -7,3 +7,6 @@
 [submodule "pbar"]
 	path = pbar
 	url = https://github.com/estshorter/pbar.git
+[submodule "color-util"]
+	path = color-util
+	url = https://github.com/yuki-koyama/color-util.git

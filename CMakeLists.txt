@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 enable_language(CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2")
 
 project(GeneticImageGenerator CXX)
 file(GLOB SOURCES ${CMAKE_SOURCE_DIR}/src/*.cpp ${CMAKE_SOURCE_DIR}/src/*.hpp)
@@ -30,3 +31,9 @@ target_link_libraries(GeneticImageGenerator SDL2_image::SDL2_image-static)
 
 ### Setup pbar ###
 include_directories(${CMAKE_SOURCE_DIR}/pbar)
+
+### Setup CIEDE2000 library ###
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIRS})
+add_subdirectory(color-util)
+include_directories(${CMAKE_SOURCE_DIR}/color-util/include)

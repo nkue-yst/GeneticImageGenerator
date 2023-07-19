@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Color.hpp"
 
 #include <iostream>
@@ -6,13 +7,17 @@
 
 #include <SDL.h>
 
-/* 8ビットx4（RGBA）をUint32型で表現するためのシフトする幅 */
+///////////////////////////////////////////////////////////////////
+///// 8ビットx4（RGBA）をUint32型で表現するためのシフトする幅 /////
+///////////////////////////////////////////////////////////////////
 #define RSHIFT (0)
 #define GSHIFT (8)
 #define BSHIFT (16)
 #define ASHIFT (24)
 
-/* 32ビット色情報から各色を取得するためのマスク */
+////////////////////////////////////////////////////////
+///// 32ビット色情報から各色を取得するためのマスク /////
+////////////////////////////////////////////////////////
 #define RMASK (0x000000ff)
 #define GMASK (0x0000ff00)
 #define BMASK (0x00ff0000)
@@ -21,7 +26,9 @@
 class Image
 {
 public:
-    /* 初期化時には横幅・高さを指定し，黒で塗りつぶす */
+    //////////////////////////////////////////////////////////
+    ///// 初期化時には横幅・高さを指定し，黒で塗りつぶす /////
+    //////////////////////////////////////////////////////////
     Image(uint32_t width, uint32_t height)
         : w(width)
         , h(height)
@@ -35,7 +42,9 @@ public:
         }
     }
 
-    /* SDL_Surfaceに変換する処理 */
+    /////////////////////////////////////
+    ///// SDL_Surfaceに変換する処理 /////
+    /////////////////////////////////////
     SDL_Surface* convertToSurface()
     {
         SDL_Surface* surface = SDL_CreateRGBSurface(0, this->w, this->h, 32, 0, 0, 0, 0);
@@ -55,7 +64,9 @@ public:
         return surface;
     }
 
-    /* SDL_Textureに変換する処理 */
+    /////////////////////////////////////
+    ///// SDL_Textureに変換する処理 /////
+    /////////////////////////////////////
     SDL_Texture* convertToTexture(SDL_Renderer* renderer)
     {
         SDL_Surface* surface = this->convertToSurface();
@@ -65,7 +76,9 @@ public:
         return texture;
     }
 
-    /* SDL_SurfaceをImageに変換する */
+    ////////////////////////////////////////
+    ///// SDL_SurfaceをImageに変換する /////
+    ////////////////////////////////////////
     static Image* convertoToImage(SDL_Surface* surface)
     {
         Image* img = new Image(surface->w, surface->h);
@@ -85,7 +98,9 @@ public:
         return img;
     }
 
-    /* 2枚の画像間のスコアを計算する */
+    /////////////////////////////////////////
+    ///// 2枚の画像間のスコアを計算する /////
+    /////////////////////////////////////////
     double calcScore(const Image* img)
     {
         double score = 0.0;
@@ -94,7 +109,8 @@ public:
         {
             for (uint32_t x = 0; x < this->w; x++)
             {
-                score += calcEuclid(this->pixels[y * this->w + x], img->pixels[y * img->w + x]);
+                //score += calcEuclid(this->pixels[y * this->w + x], img->pixels[y * img->w + x]);
+                score += calcCIEDE2000(this->pixels[y * this->w + x], img->pixels[y * img->w + x]);
             }
         }
 
